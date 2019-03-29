@@ -17,3 +17,10 @@ def fast_gelu(x):
 
 # practically, these 2 functions can be replaced as approximation
 # however, gelu != fast_gelu in fact, just approximation for fast execution
+
+if __name__ == "__main__":
+  tf.enable_eager_execution()
+  x = tf.Variable(1.2)
+  v1, v2 = gelu(x), fast_gelu(x)
+  print(v1, v2)
+
