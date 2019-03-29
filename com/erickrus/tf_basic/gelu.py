@@ -15,3 +15,5 @@ def fast_gelu(x):
     )
   )
 
+# practically, these 2 functions can be replaced as approximation
+# however, gelu != fast_gelu in fact, just approximation for fast execution
