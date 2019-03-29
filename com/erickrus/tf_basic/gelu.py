@@ -5,7 +5,7 @@ import numpy as np
 # https://www.programcreek.com/python/example/90479/tensorflow.erf
 
 def gelu(x):
-  return x * tf.erfc(-x / tf.sqrt(2.)) / 2.
+  return tf.multiply(x, tf.erfc(-x / tf.sqrt(2.)) / 2.)
 
 # basically, we use fast_gelu
 def fast_gelu(x):
