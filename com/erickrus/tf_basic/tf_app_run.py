@@ -8,7 +8,7 @@
 import tensorflow as tf
 
 flags = tf.app.flags
-FLAGS = flags.FLAG
+FLAGS = flags.FLAGS
 flags.DEFINE_integer('epoch_num', 20, 'number of epoch')
 
 def main():
