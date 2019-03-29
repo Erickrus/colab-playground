@@ -11,7 +11,8 @@ flags = tf.app.flags
 FLAGS = flags.FLAGS
 flags.DEFINE_integer('epoch_num', 20, 'number of epoch')
 
-def main():
+# notice that main will take some parameters, so just give the anonymous _
+def main(_):
   print(FLAGS.epoch_num)
 
 if __name__ == "__main__":
