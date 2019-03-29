@@ -15,8 +15,18 @@ def fast_gelu(x):
     )
   )
 
-# practically, these 2 functions can be replaced as approximation
-# however, gelu != fast_gelu in fact, just approximation for fast execution
+# in BERT implementation, it is the fast-gelu algorithm
+# except the cdf part is extracted as a named node in the graph
+def bert_gelu(x):
+  cdf = 0.5 * (
+    1.0 + tf.tanh((
+      np.sqrt(2 / np.pi) * (x + 0.044715 * tf.pow(x, 3))
+    ))
+  )
+  return x * cdf
+
+# Practically, these 2 functions can be replaced as approximation
+# However, gelu != fast_gelu in fact, just approximation for fast execution
 
 if __name__ == "__main__":
   tf.enable_eager_execution()
