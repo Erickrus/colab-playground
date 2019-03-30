@@ -63,5 +63,4 @@ if __name__ == "__main__":
   print(tList.exponential_decay_score(p, 20))
   print(tList.exponential_decay_score(p, 21))
 
-  ba = BayesianAverage()
-  print(ba.average(np.array(list(range(20))),100,5))
+  print(tList.average(np.array(list(range(20))),100,5))
