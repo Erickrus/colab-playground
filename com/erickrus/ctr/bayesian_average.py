@@ -13,6 +13,6 @@ class BayesianAverage:
     m是平均投票得分；
     C是平均投票人数
     """
-    xBar = (C*m + np.sum(x)) / (C + np.count(x))
+    xBar = (C*m + np.sum(x)) / (C + x.size)
     return xBar
 
