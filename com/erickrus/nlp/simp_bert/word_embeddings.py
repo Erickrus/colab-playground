@@ -4,8 +4,8 @@ import tensorflow as tf
 
 class WordEmbeddings:
   def __init__():
-  	self.modelBasePath = '/content/drive/My Drive/workspace/bert_model'
-  	self.modelBaseUrl = 'https://storage.googleapis.com/bert_models'
+    self.modelBasePath = '/content/drive/My Drive/workspace/bert_model'
+    self.modelBaseUrl = 'https://storage.googleapis.com/bert_models'
     self.modelPublishDate = '2018_10_18'
 
   def download_model(self, modelName = 'uncased_L-12_H-768_A-12'):
