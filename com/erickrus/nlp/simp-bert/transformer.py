@@ -7,11 +7,21 @@ class Transformer:
   def __init__(self):
     self.keepProb = 0.9
 
+  def gelu(self, x):
+    cdf = 0.5 * (
+      1.0 + tf.tanh((
+        np.sqrt(2 / np.pi) * (x + 0.044715 * tf.pow(x, 3))
+      ))
+    )
+    return x * cdf
+
   def attention(self, query, key, value, mask=None, dropout=False):
-    "Compute 'Scaled Dot Product Attention'"
+    """Compute 'Scaled Dot Product Attention' with following formula
+    $Attention(Q,K,V)=softmax(\frac{QK^T}{\sqrt{K_d}})V$"""
     d_k = query.get_shape().as_list()[-1]
     scores = tf.matmul(query, tf.transpose(key)) / math.sqrt(d_k)
     
+    # replace all units in score with 
     if mask is not None:
       "scores = masked_fill(scores, mask == 0, -1e9)"
       mask = tf.abs(tf.sign(mask))
@@ -24,11 +34,15 @@ class Transformer:
     return tf.matmul(pAttn, value), pAttn
       
 
-  def multi_headed_attention(self, query, key, value, mask=None, size=512, h=8):
+  def multi_headed_attention(self, query, key, value, mask=None):
     "Take in model size and number of heads."
     "Implements Figure 2"
     # assert size % h == 0
     # We assume d_v always equals d_k
+
+
+    h = 8 # number of headers
+    size = 512
     d_k = size // h
     
         
