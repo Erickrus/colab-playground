@@ -3,7 +3,7 @@ import os
 import tensorflow as tf
 
 class WordEmbeddings:
-  def __init__():
+  def __init__(self):
     self.modelBasePath = '/content/drive/My Drive/workspace/bert_model'
     self.modelBaseUrl = 'https://storage.googleapis.com/bert_models'
     self.modelPublishDate = '2018_10_18'
