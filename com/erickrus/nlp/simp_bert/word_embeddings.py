@@ -49,4 +49,5 @@ class WordEmbeddings:
           break
       
       saver = tf.train.Saver(var_list=[embedding_table])
+      os.system('mkdir -p "%s/word_embeddings"' % self.modelBasePath)
       saver.save(sess, os.path.join(self.modelBasePath, word_embeddings_model_name))
