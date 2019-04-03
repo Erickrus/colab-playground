@@ -9,7 +9,7 @@ class WordEmbeddings:
     self.modelPublishDate = '2018_10_18'
 
   def download_model(self, modelName = 'uncased_L-12_H-768_A-12'):
-
+    print('download_model()')
     os.system('rm -Rf "%s"' % self.modelBasePath)
     os.system('mkdir -p "%s"' % self.modelBasePath)
     os.system('cd "%s" && wget -c "%s/%s/%s.zip"' % (self.modelBasePath, self.modelBaseUrl, self.modelPublishDate, modelName))
@@ -17,6 +17,7 @@ class WordEmbeddings:
     os.system('tree "%s"' % self.modelBasePath)
 
   def extract_model(self, modelName = 'uncased_L-12_H-768_A-12'):
+  	print('extract_model()')
     modelPath = os.path.join(self.modelBasePath, modelName)
     # bert/embeddings/word_embeddings:0 (30522, 768)
     word_embeddings_variable_name = 'bert/embeddings/word_embeddings'
