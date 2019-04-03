@@ -10,11 +10,11 @@ class WordEmbeddings:
 
   def download_model(self, modelName = 'uncased_L-12_H-768_A-12'):
 
-    os.system('rm -Rf %s' % self.modelBasePath)
-    os.system('mkdir -p %s' % self.modelBasePath)
-    os.system('cd %s && wget -c %s/%s/%s.zip' % (self.modelBasePath, self.modelBaseUrl, self.modelPublishDate, modelName))
-    os.system('cd %s && unzip %s.zip -d %s' % (self.modelBasePath, modelName, self.modelBasePath))
-    os.system('tree %s' % self.modelBasePath)
+    os.system('rm -Rf "%s"' % self.modelBasePath)
+    os.system('mkdir -p "%s"' % self.modelBasePath)
+    os.system('cd "%s" && wget -c "%s/%s/%s.zip"' % (self.modelBasePath, self.modelBaseUrl, self.modelPublishDate, modelName))
+    os.system('cd "%s" && unzip %s.zip -d "%s"' % (self.modelBasePath, modelName, self.modelBasePath))
+    os.system('tree "%s"' % self.modelBasePath)
 
   def extract(self, modelName = 'uncased_L-12_H-768_A-12'):
     modelPath = os.path.join(self.modelBasePath, modelName)
