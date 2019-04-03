@@ -18,8 +18,9 @@ class WordEmbeddings:
 
   def extract_model(self, modelName = 'uncased_L-12_H-768_A-12'):
     modelPath = os.path.join(self.modelBasePath, modelName)
+    # bert/embeddings/word_embeddings:0 (30522, 768)
     word_embeddings_variable_name = 'bert/embeddings/word_embeddings'
-    word_embeddings_model_name = 'word_embeddings'
+    word_embeddings_model_name = 'word_embeddings/word_embeddings'
 
     config = modeling.BertConfig.from_json_file(os.path.join(modelPath, "bert_config.json"))
 
