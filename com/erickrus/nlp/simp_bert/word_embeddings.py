@@ -16,7 +16,7 @@ class WordEmbeddings:
     os.system('cd "%s" && unzip %s.zip -d "%s"' % (self.modelBasePath, modelName, self.modelBasePath))
     os.system('tree "%s"' % self.modelBasePath)
 
-  def extract(self, modelName = 'uncased_L-12_H-768_A-12'):
+  def extract_model(self, modelName = 'uncased_L-12_H-768_A-12'):
     modelPath = os.path.join(self.modelBasePath, modelName)
     word_embeddings_variable_name = 'bert/embeddings/word_embeddings'
     word_embeddings_model_name = 'word_embeddings'
