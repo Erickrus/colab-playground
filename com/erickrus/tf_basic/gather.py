@@ -10,4 +10,7 @@ with tf.Session() as sess:
   sess.run(tf.global_variables_initializer())
   print(sess.run(tf.gather(a, index_a)))
   print(sess.run(tf.gather(b, index_b)))
-  
+
+
+# https://blog.csdn.net/Cyiano/article/details/76087747
+# quite useful in looking up from embedding, just like the vlookup in excel
