@@ -24,6 +24,7 @@ class WordEmbeddings:
       if v.name.find(tensorName) >=0:
         self.inspect(v)
         return v
+    return None
 
   def inspect(self, tensor):
     print(tensor.name, tensor.shape, tensor.dtype)
@@ -32,7 +33,9 @@ class WordEmbeddings:
     print('extract_model()')
     modelPath = os.path.join(self.modelBasePath, modelName)
     # bert/embeddings/word_embeddings:0 (30522, 768)
+    # basically it is the same size as lines in vocab.txt
     
+    tf.reset_default_graph()
     config = modeling.BertConfig.from_json_file(os.path.join(modelPath, "bert_config.json"))
 
     # input_ids: int32 Tensor of shape [batch_size, seq_length].
@@ -55,6 +58,7 @@ class WordEmbeddings:
       tf.train.init_from_checkpoint(init_checkpoint, assignment_map)
       embedding_table = self.find_tensor_by_name(self.word_embeddings_variable_name)
       
+      # save as numpy
       npyWordEmbedding = sess.run(embedding_table)
       npyWordEmbeddingFilename = os.path.join(self.modelBasePath, self.word_embeddings_model_name)
       np.save(open(npyWordEmbeddingFilename, 'wb'), npyWordEmbedding)
@@ -81,10 +85,24 @@ class WordEmbeddings:
 """
 
 Another solution is:
-with tf.variable_scope("encoder")
-   ...
-vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='encoder')
-saver = tf.train.Saver(vars)
-saver.save(sess=sess, save_path="...")
+
+# save ckpt
+saver = tf.train.Saver(var_list=[embedding_table])
+saver.save(sess, '/content/drive/My Drive/workspace/bert_model/word_embeddings/word_embeddings')
+
+
+# restore ckpt
+tf.reset_default_graph()
+# redefining the variable with scope
+with tf.variable_scope("bert", reuse=tf.AUTO_REUSE):
+  with tf.variable_scope("embeddings", reuse=tf.AUTO_REUSE):
+    embedding_table = tf.get_variable(name="word_embeddings", shape=[30522, 768], dtype=tf.float32)
+
+init = tf.global_variables_initializer()
+sess = tf.Session()
+sess.run(init)
+
+saver = tf.train.Saver()
+saver.restore(sess, '/content/drive/My Drive/workspace/bert_model/word_embeddings/word_embeddings')
 
 """
