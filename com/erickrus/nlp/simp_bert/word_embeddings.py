@@ -17,7 +17,7 @@ class WordEmbeddings:
     os.system('tree "%s"' % self.modelBasePath)
 
   def extract_model(self, modelName = 'uncased_L-12_H-768_A-12'):
-  	print('extract_model()')
+    print('extract_model()')
     modelPath = os.path.join(self.modelBasePath, modelName)
     # bert/embeddings/word_embeddings:0 (30522, 768)
     word_embeddings_variable_name = 'bert/embeddings/word_embeddings'
@@ -52,3 +52,4 @@ class WordEmbeddings:
       saver = tf.train.Saver(var_list=[embedding_table])
       os.system('mkdir -p "%s/word_embeddings"' % self.modelBasePath)
       saver.save(sess, os.path.join(self.modelBasePath, word_embeddings_model_name))
+      
