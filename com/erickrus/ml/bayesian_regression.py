@@ -1,4 +1,54 @@
 import numpy as np
+import itertools
+import functools
+
+
+class PolynomialFeature(object):
+    """
+    polynomial features
+    transforms input array with polynomial features
+    Example
+    =======
+    x =
+    [[a, b],
+    [c, d]]
+    y = PolynomialFeatures(degree=2).transform(x)
+    y =
+    [[1, a, b, a^2, a * b, b^2],
+    [1, c, d, c^2, c * d, d^2]]
+    """
+
+    def __init__(self, degree=2):
+        """
+        construct polynomial features
+        Parameters
+        ----------
+        degree : int
+            degree of polynomial
+        """
+        assert isinstance(degree, int)
+        self.degree = degree
+
+    def transform(self, x):
+        """
+        transforms input array with polynomial features
+        Parameters
+        ----------
+        x : (sample_size, n) ndarray
+            input array
+        Returns
+        -------
+        output : (sample_size, 1 + nC1 + ... + nCd) ndarray
+            polynomial features
+        """
+        if x.ndim == 1:
+            x = x[:, None]
+        x_t = x.transpose()
+        features = [np.ones(len(x))]
+        for degree in range(1, self.degree + 1):
+            for items in itertools.combinations_with_replacement(x_t, degree):
+                features.append(functools.reduce(lambda x, y: x * y, items))
+        return np.asarray(features).transpose()
 
 class BayesianRegression:
     """
@@ -77,10 +127,56 @@ class BayesianRegression:
             )
             y_sample = X @ w_sample.T
             return y_sample
-            
+
         y = X @ self.w_mean
         if return_std:
             y_var = 1 / self.beta + np.sum(X @ self.w_cov * X, axis=1)
             y_std = np.sqrt(y_var)
             return y, y_std
         return y
+
+if __name__ == "__main__":
+    import matplotlib.pyplot as plt
+    %matplotlib inline
+    # from com.erickrus.ml.bayesian_regression import BayesianRegression
+
+    def create_toy_data(func, sample_size, std, domain=[0, 1]):
+        x = np.linspace(domain[0], domain[1], sample_size)
+        np.random.shuffle(x)
+        t = func(x) + np.random.normal(scale=std, size=x.shape)
+        return x, t
+
+
+    def linear(x):
+        return -0.3 + 0.5 * x
+
+    def main():
+        x_train, y_train = create_toy_data(linear, 20, 0.1, [-1, 1])
+        x = np.linspace(-1, 1, 100)
+        w0, w1 = np.meshgrid(
+            np.linspace(-1, 1, 100),
+            np.linspace(-1, 1, 100))
+        w = np.array([w0, w1]).transpose(1, 2, 0)
+
+        feature = PolynomialFeature(degree=1)
+        X_train = feature.transform(x_train)
+        X = feature.transform(x)
+        model = BayesianRegression(alpha=1., beta=100.)
+
+        for begin, end in [[0, 0], [0, 1], [1, 2], [2, 3], [3, 20]]:
+            model.fit(X_train[begin: end], y_train[begin: end])
+            plt.subplot(1, 2, 1)
+            plt.scatter(-0.3, 0.5, s=200, marker="x")
+            plt.contour(w0, w1, multivariate_normal.pdf(w, mean=model.w_mean, cov=model.w_cov))
+            plt.gca().set_aspect('equal')
+            plt.xlabel("$w_0$")
+            plt.ylabel("$w_1$")
+            plt.title("prior/posterior")
+
+            plt.subplot(1, 2, 2)
+            plt.scatter(x_train[:end], y_train[:end], s=100, facecolor="none", edgecolor="steelblue", lw=1)
+            plt.plot(x, model.predict(X, sample_size=6), c="orange")
+            plt.xlim(-1, 1)
+            plt.ylim(-1, 1)
+            plt.gca().set_aspect('equal', adjustable='box')
+            plt.show()
