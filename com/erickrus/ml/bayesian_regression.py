@@ -1,6 +1,8 @@
 import numpy as np
 import itertools
 import functools
+from scipy.stats import multivariate_normal
+
 
 
 class PolynomialFeature(object):
@@ -58,8 +60,10 @@ class BayesianRegression:
     y = X @ w
     t ~ N(t|X @ w, beta^(-1))
     """
+    # 此处 @ 操作符 X @ w 相当于np.matmul(X, w), 1D时是向量乘法
 
     def __init__(self, alpha:float=1., beta:float=1.):
+        # 只在初始化 precision_prev 时使用alhpa
         self.alpha = alpha
         self.beta = beta
         self.w_mean = None
@@ -86,15 +90,26 @@ class BayesianRegression:
             training data dependent variable
         """
 
+
+        # w ~ N(0, alpha^(-1)I)
+        # y = np.matmul(X, w)
+        # t ~ N(y, beta^(-1))
         mean_prev, precision_prev = self._get_prior(np.size(X, 1))
 
+        # 此处增量为: beta * np.matmul(X.T, X)
         w_precision = precision_prev + self.beta * X.T @ X
+
+        # 为方程: np.matmul(w_precision, w_mean) = np.matmul(precision_prev, mean_prev) + beta * np.matmul(X.T, t)
+        # 求解 => w_mean
+        # 此处增量为: beta * np.matmul(X.T, t)
         w_mean = np.linalg.solve(
             w_precision,
             precision_prev @ mean_prev + self.beta * X.T @ t
         )
         self.w_mean = w_mean
         self.w_precision = w_precision
+
+        # w_cov = w_precision^(-1)
         self.w_cov = np.linalg.inv(self.w_precision)
 
     def predict(self, X:np.ndarray, return_std:bool=False, sample_size:int=None):
@@ -121,6 +136,8 @@ class BayesianRegression:
             samples from the predictive distribution
         """
 
+        # 从N(w_mean, w_cov)分布中采样sample_size次, 得到w_sample
+        # 根据np.matmul(X, w_sample)计算出y_sample 并返回
         if sample_size is not None:
             w_sample = np.random.multivariate_normal(
                 self.w_mean, self.w_cov, size=sample_size
@@ -128,6 +145,7 @@ class BayesianRegression:
             y_sample = X @ w_sample.T
             return y_sample
 
+        # 此处可得出y的标准差y_std, 用来作为置信度参数
         y = X @ self.w_mean
         if return_std:
             y_var = 1 / self.beta + np.sum(X @ self.w_cov * X, axis=1)
@@ -140,19 +158,22 @@ if __name__ == "__main__":
     #%matplotlib inline
     # from com.erickrus.ml.bayesian_regression import BayesianRegression
 
+    # 构造一个玩具数据集, 事实上贝叶斯线性回归也只需要很少的数据即可
     def create_toy_data(func, sample_size, std, domain=[0, 1]):
         x = np.linspace(domain[0], domain[1], sample_size)
         np.random.shuffle(x)
         t = func(x) + np.random.normal(scale=std, size=x.shape)
         return x, t
 
-
+    # 构造一个简单线性函数
     def linear(x):
         return -0.3 + 0.5 * x
 
     def main():
         x_train, y_train = create_toy_data(linear, 20, 0.1, [-1, 1])
         x = np.linspace(-1, 1, 100)
+
+        # 构造一个 二维空间mesh 从 w0:(-1,1), w1:(-1,1) 两个不同维度组合的空间点集
         w0, w1 = np.meshgrid(
             np.linspace(-1, 1, 100),
             np.linspace(-1, 1, 100))
@@ -163,11 +184,21 @@ if __name__ == "__main__":
         X = feature.transform(x)
         model = BayesianRegression(alpha=1., beta=100.)
 
+        # 依次切片X_train, y_train数据, 送入model.fit(), 然后绘制图形
         for begin, end in [[0, 0], [0, 1], [1, 2], [2, 3], [3, 20]]:
             model.fit(X_train[begin: end], y_train[begin: end])
             plt.subplot(1, 2, 1)
             plt.scatter(-0.3, 0.5, s=200, marker="x")
-            plt.contour(w0, w1, multivariate_normal.pdf(w, mean=model.w_mean, cov=model.w_cov))
+            # 以 model里的 mean, cov 作为参数, 绘制等高线图, 范围取值 w0, w1, w
+            plt.contour(
+                w0, 
+                w1, 
+                multivariate_normal.pdf(
+                    w, 
+                    mean=model.w_mean, 
+                    cov=model.w_cov
+                )
+            )
             plt.gca().set_aspect('equal')
             plt.xlabel("$w_0$")
             plt.ylabel("$w_1$")
