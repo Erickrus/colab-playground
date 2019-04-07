@@ -137,7 +137,7 @@ class BayesianRegression:
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
-    %matplotlib inline
+    #%matplotlib inline
     # from com.erickrus.ml.bayesian_regression import BayesianRegression
 
     def create_toy_data(func, sample_size, std, domain=[0, 1]):
